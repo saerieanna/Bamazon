@@ -78,24 +78,25 @@ function customer() {
             var chosenID = answer.itemId - 1;
             var chosenProduct = res[chosenID];
             var chosenQuantity = answer.Quantity;
+            console.log(answer.itemId);
             if (chosenQuantity <= res[chosenID].stock_quantity) {
                 console.log("Your total for " + "(" + answer.Quantity + ")" + " - " + res[chosenID].product_name + " is:$ " + res[chosenID].price.toFixed(2) * chosenQuantity);
 
                 dbConnection.query("UPDATE products SET ? WHERE ?", [{
                     stock_quantity: (res[chosenID].stock_quantity - chosenQuantity)
                 }, {
-                    id: chosenID.id
+                    item_id: answer.itemId
                 }], function(err, res) {
                     console.log("Thanks for your purchase.");
-
+                    dbConnection.query("SELECT * FROM products", function(err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        console.log("udpated stock on Bamazon is shown above");
+                        runApp();
+                    });
 
                 });
-                dbConnection.query("SELECT * FROM products", function(err, res) {
-                    if (err) throw err;
-                    console.table(res);
-                    console.log("udpated stock on Bamazon is shown above");
-                    runApp();
-                });
+
             } else {
                 console.log("error...insuffucient quantities");
                 customer();
